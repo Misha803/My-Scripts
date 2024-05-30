@@ -20,4 +20,6 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 
 ## Contact
 
-If you have any questions or want to reach out, you can find me on Telegram: t.me/droidscripts
+If you have any questions or want to reach out, you can find me on Telegram: https://t.me/Misha_803
+
+My channel: https://t.me/droidscripts 
