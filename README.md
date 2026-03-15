@@ -1,7 +1,7 @@
 # My-Scripts
 
-Hey there! 👋 Welcome to **`My-Scripts`** aka **`WOA Tools & Scripts Official🔥`**!  
-This GitHub repository serves as a mirror of our Telegram channel, where you'll find all the latest updates, features, and tools for Windows on ARM (WOA) devices. Whether you're here for downloads, updates, or guidance, you've come to the right place! Stay tuned for exciting content and join the chat: [Official Chat](https://t.me/woascriptsofficial_chat).
+Hey there! 👋 Welcome to **`My-Scripts`** aka **`WOA Tools Official🔥`**!  
+This GitHub repository serves as a mirror of our Telegram channel, where you'll find all the latest updates, features, and tools for Windows on ARM (WOA) devices. Whether you're here for downloads, updates, or guidance, you've come to the right place! Stay tuned for exciting content and join the chat: [Official Chat](https://t.me/woatools_chat).
 
 ---
 
@@ -27,7 +27,7 @@ The tools in this repository are distributed **without source code**. If you req
 
 Access is granted on a case-by-case basis.
 
-If you have suggestions for improvements or ideas for new tools, feel free to share them with me on Telegram or in the [Official Chat](https://t.me/woascriptsofficial_chat). Your feedback is always welcome!
+If you have suggestions for improvements or ideas for new tools, feel free to share them with me on Telegram or in the [Official Chat](https://t.me/woatools_chat). Your feedback is always welcome!
 
 ---
 
@@ -39,4 +39,4 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## Contact
 If you have any questions or want to reach out:
 - 📩 [Contact me on Telegram](https://t.me/Misha_803)
-- 📢 Check out my channel: [⚡️WOA Tools & Scripts Official⚡️](https://t.me/woascriptsofficial)
+- 📢 Check out my channel: [⚡️WOA Tools Official⚡️](https://t.me/woatools)
