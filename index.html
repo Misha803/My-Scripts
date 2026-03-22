@@ -305,19 +305,19 @@
                 description: `• Use it to easily set up Android boot.img auto-flashing on Windows boot or when the battery is low (<15% / 20%).\n• Requires StA/sdd installed (to be able to flash Android boot.img ofc)` 
             },
             { 
-                id: 'rotate', category: 'general', name: 'QuickRotate V6', 
+                id: 'rotate', category: 'woa general', name: 'QuickRotate V6', 
                 api: 'https://api.github.com/repos/ArKT-7/QuickRotate/releases/latest', 
                 url: 'https://github.com/ArKT-7/QuickRotate/releases/latest', 
                 description: `• QuickRotate lets you easily change screen orientation on your device – just 1 click to rotate✨\n• I don't really know why V5 was skipped\n• This update was fully done by @ArKT_7` 
             },
             { 
-                id: 'power', category: 'general', name: 'PowerStateControl', 
+                id: 'power', category: 'woa general', name: 'PowerStateControl', 
                 api: 'https://api.github.com/repos/Misha803/WOA-Tools/releases/tags/PowerStateControl', 
                 url: 'https://github.com/Misha803/WOA-Tools/releases/tag/PowerStateControl', 
                 description: `• A tool that lets you easily toggle HIBERNATION and FAST STARTUP on your device.\n⚠️ It's not recommended to turn on HIBERNATION and FAST STARTUP on WOA devices, as they may not function properly and can interfere with resizing the Windows partition.` 
             },
             { 
-                id: 'taskbar', category: 'general', name: 'OptimizedTaskbarControl', 
+                id: 'taskbar', category: 'woa general', name: 'OptimizedTaskbarControl', 
                 api: 'https://api.github.com/repos/Misha803/WOA-Tools/releases/tags/Optimized-Taskbar-Control', 
                 url: 'https://github.com/Misha803/WOA-Tools/releases/tag/Optimized-Taskbar-Control', 
                 description: `• A tool that allows you to easily enable or disable Tablet Optimized Taskbar on Windows 11 devices.` 
@@ -348,15 +348,21 @@
             document.querySelectorAll('.filter-btn').forEach(btn => {
                 if(btn.dataset.filter === category) {
                     btn.classList.add('bg-blue-600', 'text-white', 'border-blue-500', 'shadow-lg', 'shadow-blue-500/20');
-                    btn.classList.remove('bg-white/5', 'text-gray-400', 'border-white/10');
+                    btn.classList.remove('bg-white/5', 'text-gray-400', 'border-white/10', 'hover:bg-white/10', 'hover:text-white', 'hover:border-white/20');
                 } else {
                     btn.classList.remove('bg-blue-600', 'text-white', 'border-blue-500', 'shadow-lg', 'shadow-blue-500/20');
-                    btn.classList.add('bg-white/5', 'text-gray-400', 'border-white/10');
+                    btn.classList.add('bg-white/5', 'text-gray-400', 'border-white/10', 'hover:bg-white/10', 'hover:text-white', 'hover:border-white/20');
                 }
             });
 
             document.querySelectorAll('.tool-card').forEach(card => {
-                card.style.display = (category === 'all' || card.dataset.category === category) ? 'flex' : 'none';
+                const cardCategories = card.dataset.category.split(' '); 
+                
+                if (category === 'all' || cardCategories.includes(category)) {
+                    card.style.display = 'flex';
+                } else {
+                    card.style.display = 'none';
+                }
             });
         }
 
