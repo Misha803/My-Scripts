@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WOA Tools Official</title>
+    
+    <!-- Site Icon (Favicon) -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⚡</text></svg>">
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Marked.js for parsing GitHub Markdown -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
+    <style>
+        :root { --bg: #03050d; }
+        
+        body { 
+            background-color: var(--bg); 
+            color: #ffffff; 
+            overflow-x: hidden;
+            font-family: 'Inter', sans-serif;
+        }
+        
+        #plasma-canvas, #stars-canvas {
+            position: fixed; inset: 0; width: 100%; height: 100%;
+            pointer-events: none; z-index: 0;
+        }
+        #plasma-canvas { opacity: 0.88; }
+        #stars-canvas { opacity: 0.65; }
+
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: var(--bg); }
+        ::-webkit-scrollbar-thumb { background: #1f2937; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #374151; }
+
+        /* Modal Transitions */
+        .modal-overlay { opacity: 0; pointer-events: none; transition: opacity 0.3s ease; }
+        .modal-overlay.open { opacity: 1; pointer-events: auto; }
+        .modal-content { transform: translateY(20px) scale(0.95); transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
+        .modal-overlay.open .modal-content { transform: translateY(0) scale(1); }
+        
+        /* Markdown formatting for the modal */
+        .markdown-body ul { list-style-type: disc; margin-left: 1.5rem; margin-top: 0.5rem; margin-bottom: 0.5rem; }
+        .markdown-body h1, .markdown-body h2, .markdown-body h3 { font-weight: bold; margin-top: 1rem; margin-bottom: 0.5rem; color: white; }
+        .markdown-body p { margin-bottom: 0.75rem; }
+        .markdown-body a { color: #60a5fa; text-decoration: underline; }
+
+        /* FAQ Accordion Styling */
+        details > summary { list-style: none; }
+        details > summary::-webkit-details-marker { display: none; }
+    </style>
+</head>
+<body class="bg-[#03050d] text-white min-h-screen antialiased selection:bg-blue-500 selection:text-white relative">
+
+    <!-- Canvas Backgrounds -->
+    <canvas id="plasma-canvas"></canvas>
+    <canvas id="stars-canvas"></canvas>
+
+    <!-- Top Nav -->
+    <nav class="w-full pt-8 pb-4 px-6 relative z-50">
+        <div class="max-w-7xl mx-auto flex justify-center md:justify-start items-center space-x-6 text-sm font-medium text-gray-400">
+            <a href="https://github.com/Misha803/WOA-Tools" target="_blank" class="hover:text-white transition duration-200">GitHub Repo</a>
+            <span class="text-gray-700">|</span>
+            <a href="https://t.me/woatools" target="_blank" class="hover:text-white transition duration-200">Channel</a>
+            <a href="https://t.me/woatools_chat" target="_blank" class="hover:text-white transition duration-200">Discussion</a>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <header class="relative pt-12 pb-16 flex flex-col items-center text-center px-4 z-10">
+        <div class="mb-6 px-4 py-1.5 bg-white/5 border border-white/10 rounded-full text-xs font-bold tracking-widest text-gray-300 uppercase shadow-lg backdrop-blur-sm">
+            • WINDOWS ON ARM • UTILITIES
+        </div>
+        <h1 class="text-6xl md:text-8xl font-extrabold tracking-tight mb-4 drop-shadow-2xl text-white">WOA Tools</h1>
+        <p class="text-lg md:text-xl text-gray-300 mb-10 font-light drop-shadow-md max-w-2xl">
+            Our tools are made to simplify and enhance your WOA devices experience <span class="text-blue-400">⚡️</span>
+        </p>
+        <div class="flex flex-col sm:flex-row items-center justify-center gap-4 w-full max-w-md">
+            <a href="#tools" class="w-full sm:w-auto px-8 py-3.5 bg-blue-600 hover:bg-blue-500 hover:scale-[1.02] active:scale-95 text-white font-semibold rounded-2xl transition-all duration-300 shadow-[0_0_20px_rgba(37,99,235,0.4)] hover:shadow-[0_0_30px_rgba(37,99,235,0.6)]">
+                Explore Tools
+            </a>
+        </div>
+    </header>
+
+    <!-- Tools Grid Section -->
+    <section id="tools" class="py-12 px-6 max-w-7xl mx-auto relative z-10 mb-12">
+        <div class="mb-8">
+            <h2 class="text-3xl font-bold mb-2 text-white text-center md:text-left">Currently Supported</h2>
+            <p class="text-gray-400 text-center md:text-left mb-6">Fetching live data and descriptions directly from GitHub.</p>
+            
+            <div class="flex flex-wrap justify-center md:justify-start gap-3">
+                <button onclick="filterTools('all')" class="filter-btn active px-5 py-2 rounded-full text-sm font-semibold transition-all duration-200 hover:scale-105 active:scale-95 bg-blue-600 text-white border border-blue-500 shadow-lg shadow-blue-500/20" data-filter="all">All Tools</button>
+                <button onclick="filterTools('woa')" class="filter-btn px-5 py-2 rounded-full text-sm font-medium transition-all duration-200 hover:scale-105 active:scale-95 bg-white/5 text-gray-400 border border-white/10 hover:bg-white/10 hover:text-white hover:border-white/20" data-filter="woa">WOA Devices</button>
+                <button onclick="filterTools('general')" class="filter-btn px-5 py-2 rounded-full text-sm font-medium transition-all duration-200 hover:scale-105 active:scale-95 bg-white/5 text-gray-400 border border-white/10 hover:bg-white/10 hover:text-white hover:border-white/20" data-filter="general">Any Windows</button>
+                <button onclick="filterTools('pc')" class="filter-btn px-5 py-2 rounded-full text-sm font-medium transition-all duration-200 hover:scale-105 active:scale-95 bg-white/5 text-gray-400 border border-white/10 hover:bg-white/10 hover:text-white hover:border-white/20" data-filter="pc">PC Utility</button>
+            </div>
+        </div>
+        
+        <div id="tools-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+            <!-- Loading States -->
+            <div class="bg-white/5 border border-white/10 rounded-3xl p-6 h-64 animate-pulse backdrop-blur-lg"></div>
+            <div class="bg-white/5 border border-white/10 rounded-3xl p-6 h-64 animate-pulse backdrop-blur-lg"></div>
+            <div class="bg-white/5 border border-white/10 rounded-3xl p-6 h-64 animate-pulse backdrop-blur-lg"></div>
+        </div>
+    </section>
+
+    <!-- Telegram CTA Banner -->
+    <section class="max-w-7xl mx-auto px-6 relative z-10 mb-12">
+        <div class="bg-gradient-to-br from-blue-900/40 to-[#03050d] border border-blue-500/20 rounded-[2rem] p-8 md:p-12 flex flex-col md:flex-row items-center justify-between backdrop-blur-xl shadow-2xl relative overflow-hidden transition-all duration-500 hover:border-blue-500/40 hover:shadow-[0_0_40px_rgba(37,99,235,0.15)]">
+            <!-- decorative background glow inside banner -->
+            <div class="absolute -top-24 -right-24 w-64 h-64 bg-blue-500/20 blur-[80px] rounded-full"></div>
+            
+            <div class="text-center md:text-left mb-6 md:mb-0 relative z-10">
+                <h2 class="text-3xl font-bold text-white mb-3">Join the Telegram channel</h2>
+                <p class="text-gray-400 max-w-xl text-sm md:text-base">Get instant notifications about updates or new tool releases, drop feature requests in the chat, and chat with other WOA enthusiasts!</p>
+            </div>
+            <div class="flex gap-4 relative z-10 w-full md:w-auto">
+                <a href="https://t.me/woatools" target="_blank" class="w-full md:w-auto px-8 py-4 bg-[#2AABEE] hover:bg-[#2298D6] text-white font-bold rounded-2xl transition-all duration-300 hover:scale-[1.02] active:scale-95 shadow-lg shadow-[#2AABEE]/20 flex items-center justify-center gap-3">
+                    <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69a.2.2 0 00-.05-.18c-.06-.05-.14-.03-.21-.02-.09.02-1.49.95-4.22 2.79-.4.27-.76.41-1.08.4-.36-.01-1.04-.2-1.55-.37-.63-.2-1.12-.31-1.08-.66.02-.18.27-.36.74-.55 2.92-1.27 4.86-2.11 5.83-2.51 2.78-1.16 3.35-1.36 3.73-1.36.08 0 .27.02.39.12.1.08.13.19.14.27-.01.06.01.24 0 .38z"/></svg>
+                    Telegram Channel
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- FAQ & Credits Section -->
+    <section class="max-w-7xl mx-auto px-6 relative z-10 mb-20">
+        <div class="flex flex-col lg:flex-row gap-8">
+            
+            <!-- Left Column: FAQ -->
+            <div class="lg:w-2/3">
+                <h3 class="text-2xl font-bold text-white mb-6 flex items-center gap-2">
+                    <svg class="w-6 h-6 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    Frequently Asked Questions
+                </h3>
+                
+                <details class="group bg-white/[0.02] border border-white/10 rounded-2xl p-5 mb-3 hover:bg-white/[0.04] hover:border-blue-500/30 transition-all duration-300 cursor-pointer">
+                    <summary class="flex justify-between items-center font-semibold text-white">
+                        Why is Windows Defender blocking the app?
+                        <span class="transition-transform duration-300 group-open:rotate-180 text-gray-500 group-hover:text-blue-400">
+                            <svg fill="none" height="24" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="24"><polyline points="6 9 12 15 18 9"/></svg>
+                        </span>
+                    </summary>
+                    <div class="text-gray-400 text-sm mt-4 leading-relaxed border-t border-white/10 pt-4">
+                        Because these tools are self-signed and modify system, Windows Defender sometimes flags them as unrecognized. If you are having trouble launching a tool, <a href="#" onclick="openDefenderModal(event)" class="text-blue-400 hover:text-blue-300 font-medium underline underline-offset-2 transition">Click here for the quick fix!</a>
+                    </div>
+                </details>
+
+                <details class="group bg-white/[0.02] border border-white/10 rounded-2xl p-5 hover:bg-white/[0.04] hover:border-blue-500/30 transition-all duration-300 cursor-pointer">
+                    <summary class="flex justify-between items-center font-semibold text-white">
+                        Which tool should I download first?
+                        <span class="transition-transform duration-300 group-open:rotate-180 text-gray-500 group-hover:text-blue-400">
+                            <svg fill="none" height="24" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="24"><polyline points="6 9 12 15 18 9"/></svg>
+                        </span>
+                    </summary>
+                    <div class="text-gray-400 text-sm mt-4 leading-relaxed border-t border-white/10 pt-4">
+                        We highly recommend starting with the <strong>WOA Toolbox</strong>. It serves as an all-in-one hub that allows you to easily access, run, and update all the other tools seamlessly directly from your device!
+                    </div>
+                </details>
+
+                <!-- QuickRotate FAQ -->
+                <details class="group bg-white/[0.02] border border-white/10 rounded-2xl p-5 hover:bg-white/[0.04] hover:border-blue-500/30 transition-all duration-300 cursor-pointer mt-3">
+                    <summary class="flex justify-between items-center font-semibold text-white">
+                        <span class="flex items-center gap-2">✨ QuickRotate V4 Cleanup & V6 Setup</span>
+                        <span class="transition-transform duration-300 group-open:rotate-180 text-gray-500 group-hover:text-blue-400">
+                            <svg fill="none" height="24" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="24"><polyline points="6 9 12 15 18 9"/></svg>
+                        </span>
+                    </summary>
+                    <div class="text-gray-400 text-sm mt-4 leading-relaxed border-t border-white/10 pt-4">
+                        <p class="mb-3">As we have discontinued <strong>QuickRotate V4</strong> and you're moving to the new <strong>QuickRotate V6</strong>, follow these steps to remove the old V4 from auto-start:</p>
+                        
+                        <ol class="list-decimal ml-5 mb-4 space-y-2">
+                            <li><strong>Disable V4 Autostart:</strong> Open QuickRotate V4 → Go to Settings → Uncheck all checkboxes. This stops it from starting with Windows and removes its desktop shortcuts.</li>
+                            <li><strong>Close the app.</strong></li>
+                            <li><strong>Delete the file:</strong> You can safely delete the old .exe and the folder here: <code class="bg-gray-800 text-blue-300 px-1.5 py-0.5 rounded text-xs">%AppData%\QuickRotate</code></li>
+                            <li><strong>Switch to V6:</strong> Start the new version!</li>
+                        </ol>
+                        
+                        <p class="text-blue-300/90 font-medium">🎧 Pro-tip: Don't forget to enable the "Minimize to Tray on Close" and shortcuts toggles in V6 so you don't lose your rotation toggle by accident! ❤️</p>
+                    </div>
+                </details>
+
+            </div>
+
+            <!-- Right Column: Credits -->
+            <div class="lg:w-1/3 self-start">
+                <div class="bg-white/[0.02] border border-white/10 rounded-[2rem] p-8 backdrop-blur-lg transition-all duration-500 hover:border-blue-500/20 hover:shadow-[0_0_30px_rgba(37,99,235,0.05)]">
+                    <h3 class="text-xl font-bold text-white mb-6 flex items-center gap-2">
+                        <svg class="w-6 h-6 text-yellow-500" fill="currentColor" viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+                        Project Credits
+                    </h3>
+                    <div class="flex flex-col gap-4 text-sm text-gray-400">
+                        <div class="flex justify-between items-center border-b border-white/5 pb-2">
+                            <span>Creator</span>
+                            <a href="https://github.com/Misha803" class="text-white hover:text-blue-400 font-semibold transition-colors duration-200">@misha_803</a>
+                        </div>
+                        <div class="flex justify-between items-center border-b border-white/5 pb-2">
+                            <span>QuickRotate V6</span>
+                            <a href="https://github.com/ArKT-7" class="text-white hover:text-blue-400 font-semibold transition-colors duration-200">@ArKT-7</a>
+                        </div>
+                        <div class="flex justify-between items-center border-b border-white/5 pb-2">
+                            <span>StA Shortcuts Manager</span>
+                            <a href="https://github.com/Alexey-Proger" class="text-white hover:text-blue-400 font-semibold transition-colors duration-200">@AlexeyProger</a>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span>UI Idea</span>
+                            <a href="https://t.me/crss5G" class="text-white hover:text-blue-400 font-semibold transition-colors duration-200">@crss5G</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="border-t border-white/10 bg-black/40 backdrop-blur-xl py-8 text-center relative z-10 mt-auto">
+        <p class="text-gray-500 text-sm">Designed for Windows on ARM. Hosted on GitHub Pages.</p>
+    </footer>
+
+    <!-- MODAL POPUP (Used for Changelogs & Defender Fix) -->
+    <div id="changelog-modal" class="modal-overlay fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+        <div class="modal-content bg-[#0a0f1c] border border-white/10 w-full max-w-2xl rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[85vh]">
+            <div class="px-6 py-4 border-b border-white/10 flex justify-between items-center bg-white/5">
+                <h3 id="modal-title" class="text-lg font-bold text-white">Release Notes</h3>
+                <button onclick="closeModal()" class="text-gray-400 hover:text-white bg-white/5 hover:bg-white/10 p-2 rounded-xl transition-all duration-200 hover:scale-105 active:scale-95">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+            <div id="modal-body" class="p-6 overflow-y-auto markdown-body text-gray-300 text-sm">
+                <!-- Content injected via JS -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Canvas Animations -->
+    <script>
+        (function(){
+            const cv=document.getElementById('stars-canvas'),ctx=cv.getContext('2d');
+            let W,H;
+            const S=Array.from({length:130},()=>({x:Math.random(),y:Math.random(),r:Math.random()*.8+.15,base:Math.random()*.35+.08,ts:Math.random()*.02+.007,to:Math.random()*Math.PI*2}));
+            function resize(){W=cv.width=window.innerWidth;H=cv.height=window.innerHeight;}
+            resize();window.addEventListener('resize',resize);
+            let t=0;
+            function draw(){ctx.clearRect(0,0,W,H);t+=.016;S.forEach(s=>{const a=s.base*(0.5+0.5*Math.sin(t*s.ts*60+s.to));ctx.beginPath();ctx.arc(s.x*W,s.y*H,s.r,0,Math.PI*2);ctx.fillStyle=`rgba(155,200,255,${a})`;ctx.fill();});requestAnimationFrame(draw);}
+            draw();
+        })();
+
+        (function(){
+            const cv=document.getElementById('plasma-canvas'),ctx=cv.getContext('2d');
+            let W,H,t=0;
+            const hues=[210,220,195,235,205,215,200]; 
+            const B=Array.from({length:7},(_,i)=>({x:Math.random(),y:Math.random(),vx:(Math.random()-.5)*.0004,vy:(Math.random()-.5)*.0004,r:.2+Math.random()*.17,hue:hues[i],po:Math.random()*Math.PI*2,ps:Math.random()*.005+.003}));
+            function resize(){W=cv.width=window.innerWidth;H=cv.height=window.innerHeight;}
+            resize();window.addEventListener('resize',resize);
+            function draw(){
+                ctx.clearRect(0,0,W,H);t+=.0035;
+                B.forEach((b,i)=>{
+                    b.x+=b.vx+Math.sin(t*.6+i)*.00022;b.y+=b.vy+Math.cos(t*.45+i*1.2)*.00022;
+                    if(b.x<-.3)b.x=1.3;if(b.x>1.3)b.x=-.3;if(b.y<-.3)b.y=1.3;if(b.y>1.3)b.y=-.3;
+                    const pulse=1+0.07*Math.sin(t*b.ps*250+b.po);
+                    const cx=b.x*W,cy=b.y*H,r=b.r*Math.min(W,H)*pulse;
+                    const hue=b.hue+(i%2===0?t*7:-t*5);
+                    const g=ctx.createRadialGradient(cx,cy,0,cx,cy,r);
+                    g.addColorStop(0,`hsla(${hue},92%,72%,.3)`);
+                    g.addColorStop(.4,`hsla(${hue+15},88%,56%,.14)`);
+                    g.addColorStop(1,`hsla(${hue+30},80%,38%,0)`);
+                    ctx.beginPath();ctx.arc(cx,cy,r,0,Math.PI*2);ctx.fillStyle=g;ctx.fill();
+                });
+                requestAnimationFrame(draw);
+            }
+            draw();
+        })();
+    </script>
+
+    <!-- App Logic -->
+    <script>
+        marked.use({ gfm: true, breaks: true });
+
+        const activeTools =[
+            { 
+                id: 'woa', category: 'woa', name: 'WOA Toolbox', 
+                api: 'https://api.github.com/repos/Misha803/My-Scripts/releases/tags/WOA-ToolBox', 
+                url: 'https://github.com/Misha803/My-Scripts/releases/tag/WOA-ToolBox', 
+                description: `• A utility that lets you easily access and run the latest version of any of my WOA tools.\n• Requires internet connection to download/update tools etc. (Has Offline Mode).\n• Includes an auto-update feature that keeps itself and all tools up to date automatically.` 
+            },
+            { 
+                id: 'usb', category: 'woa', name: 'USB Mode Control', 
+                api: 'https://api.github.com/repos/Misha803/My-Scripts/releases/tags/USB-Host-Mode-Control', 
+                url: 'https://github.com/Misha803/My-Scripts/releases/tag/USB-Host-Mode-Control', 
+                description: `• A tool that lets you easily switch USB mode between HOST and DEVICE (enable or disable USB host mode) on your WOA device.` 
+            },
+            { 
+                id: 'boot', category: 'woa', name: 'boot.img Auto-Flasher', 
+                api: 'https://api.github.com/repos/Misha803/My-Scripts/releases/tags/boot.img-Auto-Flasher', 
+                url: 'https://github.com/Misha803/My-Scripts/releases/tag/boot.img-Auto-Flasher', 
+                description: `• Use it to easily set up Android boot.img auto-flashing on Windows boot or when the battery is low (<15% / 20%).\n• Requires StA/sdd installed (to be able to flash Android boot.img ofc)` 
+            },
+            { 
+                id: 'rotate', category: 'general', name: 'QuickRotate V6', 
+                api: 'https://api.github.com/repos/ArKT-7/QuickRotate/releases/latest', 
+                url: 'https://github.com/ArKT-7/QuickRotate/releases/latest', 
+                description: `• QuickRotate lets you easily change screen orientation on your device – just 1 click to rotate✨\n• I don't really know why V5 was skipped\n• This update was fully done by @ArKT_7` 
+            },
+            { 
+                id: 'power', category: 'general', name: 'PowerStateControl', 
+                api: 'https://api.github.com/repos/Misha803/My-Scripts/releases/tags/PowerStateControl', 
+                url: 'https://github.com/Misha803/My-Scripts/releases/tag/PowerStateControl', 
+                description: `• A tool that lets you easily toggle HIBERNATION and FAST STARTUP on your device.\n⚠️ It's not recommended to turn on HIBERNATION and FAST STARTUP on WOA devices, as they may not function properly and can interfere with resizing the Windows partition.` 
+            },
+            { 
+                id: 'taskbar', category: 'general', name: 'OptimizedTaskbarControl', 
+                api: 'https://api.github.com/repos/Misha803/My-Scripts/releases/tags/Optimized-Taskbar-Control', 
+                url: 'https://github.com/Misha803/My-Scripts/releases/tag/Optimized-Taskbar-Control', 
+                description: `• A tool that allows you to easily enable or disable Tablet Optimized Taskbar on Windows 11 devices.` 
+            },
+            { 
+                id: 'sta', category: 'woa', name: 'StA Shortcuts Manager', 
+                api: 'https://api.github.com/repos/Alexey-Proger/staShortcutsManager/releases/latest', 
+                url: 'https://github.com/Alexey-Proger/staShortcutsManager/releases/latest', 
+                description: `• A tool that lets you easily create custom shortcuts for StA.exe with your own boot.img and icon files.` 
+            },
+            { 
+                id: 'modem', category: 'woa', name: 'ModemHide', 
+                api: 'https://api.github.com/repos/Misha803/My-Scripts/releases/tags/ModemHide', 
+                url: 'https://github.com/Misha803/My-Scripts/releases/tag/ModemHide', 
+                description: `• This simple tool will help you easily hide the modem partition by unassigning its drive letter.\n• This is recommended because this drive should not be modified, while some apps may try to write to it.\n• Use this tool directly on your WOA device.\n• I’m not sure why it’s still needed to be honest, but as far as I know, some devices still don’t have the modem partition hidden by default, so maybe it will be useful.` 
+            },
+            { 
+                id: 'drive', category: 'pc', name: 'DriveLetterAssigner', 
+                api: 'https://api.github.com/repos/Misha803/My-Scripts/releases/tags/DriveLetterAssigner', 
+                url: 'https://github.com/Misha803/My-Scripts/releases/tag/DriveLetterAssigner', 
+                description: `• This simple tool will help you easily assign drive letters to the WIN and ESP partitions of your WOA device\n• Use this tool while installing Windows, updating drivers etc on your WOA device` 
+            }
+        ];
+
+        const releaseNotesCache = {};
+
+        function filterTools(category) {
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                if(btn.dataset.filter === category) {
+                    btn.classList.add('bg-blue-600', 'text-white', 'border-blue-500', 'shadow-lg', 'shadow-blue-500/20');
+                    btn.classList.remove('bg-white/5', 'text-gray-400', 'border-white/10');
+                } else {
+                    btn.classList.remove('bg-blue-600', 'text-white', 'border-blue-500', 'shadow-lg', 'shadow-blue-500/20');
+                    btn.classList.add('bg-white/5', 'text-gray-400', 'border-white/10');
+                }
+            });
+
+            document.querySelectorAll('.tool-card').forEach(card => {
+                card.style.display = (category === 'all' || card.dataset.category === category) ? 'flex' : 'none';
+            });
+        }
+
+        // Opens normal release notes
+        function openModal(toolId, toolName) {
+            const bodyContent = releaseNotesCache[toolId] || "No detailed release notes available.";
+            document.getElementById('modal-title').innerText = `${toolName} Notes`;
+            document.getElementById('modal-body').innerHTML = marked.parse(bodyContent);
+            document.getElementById('changelog-modal').classList.add('open');
+            document.body.style.overflow = 'hidden'; 
+        }
+
+        // Opens Defender Fix instructions
+        const defenderFixMarkdown = `If you're downloading a file from our channel/GitHub repo and Windows blocks it by default, here's how to mark it as safe:
+
+**➡️ Step-by-step:**
+1. **Right-click** the downloaded file
+2. Select **Properties**
+3. At the bottom of the window, check the box **"Unblock"**
+4. Click **Apply → OK**
+
+*This tells Windows that the file is safe to use and removes the "blocked" status caused by downloading from the internet.*`;
+
+        function openDefenderModal(e) {
+            if (e) e.preventDefault(); // Stop page from scrolling to top
+            document.getElementById('modal-title').innerText = "❗ Trouble launching a downloaded tool? (Defender Fix)";
+            document.getElementById('modal-body').innerHTML = marked.parse(defenderFixMarkdown);
+            document.getElementById('changelog-modal').classList.add('open');
+            document.body.style.overflow = 'hidden'; 
+        }
+
+        function closeModal() {
+            document.getElementById('changelog-modal').classList.remove('open');
+            document.body.style.overflow = '';
+        }
+
+        document.getElementById('changelog-modal').addEventListener('click', function(e) {
+            if (e.target === this) closeModal();
+        });
+
+        function copyShareLink(url, btnElement) {
+            navigator.clipboard.writeText(url);
+            const originalHtml = btnElement.innerHTML;
+            btnElement.innerHTML = `<svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> Copied!`;
+            btnElement.classList.add('text-blue-400');
+            
+            setTimeout(() => {
+                btnElement.innerHTML = originalHtml;
+                btnElement.classList.remove('text-blue-400');
+            }, 2000);
+        }
+
+        function extractVersion(name, tag) {
+            const vMatch = name.match(/(v\d+(\.\d+)*)/i) || tag.match(/(v\d+(\.\d+)*)/i);
+            return vMatch ? vMatch[1] : tag;
+        }
+
+        function extractDateInfo(body, assets, releaseData) {
+            let extractedStr = "Unknown Date";
+            let rawTimestamp = 0;
+
+            if (body) {
+                const textMatch = body.match(/Release Date:\s*([^\n\r]+)/i);
+                if (textMatch) {
+                    let cleanText = textMatch[1]
+                        .replace(/[\u{1F600}-\u{1F6FF}\u{1F300}-\u{1F5FF}\u{1F900}-\u{1F9FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}]/gu, '')
+                        .replace(/\*/g, '').trim();
+                    extractedStr = cleanText;
+                    rawTimestamp = new Date(cleanText).getTime();
+                }
+            }
+            if (!rawTimestamp && assets && assets.length > 0) {
+                const file = assets.find(a => a.name.endsWith('.exe')) || assets.find(a => a.name.endsWith('.zip')) || assets[0];
+                if (file && file.updated_at) {
+                    extractedStr = new Date(file.updated_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+                    rawTimestamp = new Date(file.updated_at).getTime();
+                }
+            }
+            if (!rawTimestamp) {
+                const fallbackDate = releaseData.published_at || releaseData.created_at;
+                if (fallbackDate) {
+                    extractedStr = new Date(fallbackDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+                    rawTimestamp = new Date(fallbackDate).getTime();
+                }
+            }
+            return { string: extractedStr, ts: rawTimestamp || 0 };
+        }
+
+        async function loadTools() {
+            const grid = document.getElementById('tools-grid');
+            grid.innerHTML = ''; 
+            
+            for (const tool of activeTools) {
+                const card = document.createElement('div');
+                card.id = `card-${tool.id}`;
+                card.className = 'tool-card bg-white/[0.03] backdrop-blur-xl border border-white/10 p-6 rounded-[1.5rem] flex flex-col hover:bg-white/[0.05] hover:border-blue-500/30 hover:shadow-[0_8px_30px_rgba(37,99,235,0.15)] transition-all duration-300 hover:-translate-y-1 group';
+                card.dataset.category = tool.category;
+                
+                card.innerHTML = `
+                    <div class="flex justify-between items-start mb-1 gap-2">
+                        <div class="flex items-center gap-2">
+                            <h3 class="text-xl font-bold text-white tracking-tight leading-tight group-hover:text-blue-400 transition-colors duration-300">${tool.name}</h3>
+                        </div>
+                        <div id="ver-container-${tool.id}" class="flex items-center gap-2">
+                            <span id="ver-${tool.id}" class="text-[0.65rem] font-bold px-3 py-1 bg-white/10 text-gray-300 rounded-full border border-white/5 truncate max-w-[100px] shrink-0">...</span>
+                        </div>
+                    </div>
+                    
+                    <div class="text-[0.65rem] text-gray-400 font-medium mb-4 flex items-center gap-3">
+                        <span class="flex items-center gap-1.5">
+                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                            <span id="date-${tool.id}">Updating...</span>
+                        </span>
+                    </div>
+
+                    <div class="flex-grow flex flex-col mb-5">
+                        <div class="text-gray-400 text-[0.85rem] leading-relaxed whitespace-pre-line">
+                            ${tool.description}
+                        </div>
+                        <div class="flex items-center justify-between mt-3 pt-3 border-t border-white/5">
+                            <button onclick="openModal('${tool.id}', '${tool.name}')" class="text-blue-400 text-xs font-semibold hover:text-blue-300 transition-colors flex items-center gap-1 group-hover:text-blue-300">
+                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                                Read Release Notes
+                            </button>
+                            <button onclick="copyShareLink('${tool.url}', this)" class="text-gray-500 hover:text-white text-xs font-semibold transition-colors flex items-center gap-1" title="Copy Tool Link">
+                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"></path></svg>
+                                Share
+                            </button>
+                        </div>
+                    </div>
+
+                    <a id="btn-${tool.id}" href="${tool.url}" target="_blank" class="mt-auto w-full py-3 bg-[#2563EB] hover:bg-blue-500 text-white text-sm font-semibold rounded-2xl transition-all duration-300 hover:scale-[1.02] active:scale-95 shadow-lg shadow-blue-600/20 text-center border border-blue-500 flex items-center justify-center gap-2">
+                        View Release
+                    </a>
+                `;
+                grid.appendChild(card);
+            }
+
+            const fetchPromises = activeTools.map(async tool => {
+                try {
+                    const res = await fetch(tool.api);
+                    const data = await res.json();
+                    if (data.message && data.message.includes("API rate limit")) throw new Error("Rate limit");
+                    
+                    const cleanVersion = extractVersion(data.name || '', data.tag_name || 'Latest');
+                    const dateInfo = extractDateInfo(data.body, data.assets, data);
+
+                    releaseNotesCache[tool.id] = data.body || "*No detailed changelog provided for this release.*";
+
+                    let downloadUrl = tool.url;
+                    let btnText = "View Release";
+
+                    if (data.assets && data.assets.length > 0) {
+                        const asset = data.assets.find(a => a.name.endsWith('.exe')) || data.assets.find(a => a.name.endsWith('.zip')) || data.assets[0];
+                        downloadUrl = asset.browser_download_url;
+                        
+                        let sizeInBytes = asset.size;
+                        let sizeText = "";
+                        if (sizeInBytes < 1024 * 1024) {
+                            sizeText = (sizeInBytes / 1024).toFixed(0) + ' KB';
+                        } else {
+                            sizeText = (sizeInBytes / (1024 * 1024)).toFixed(1) + ' MB';
+                        }
+                        btnText = `Download (${sizeText})`;
+                    }
+
+                    document.getElementById(`ver-${tool.id}`).innerText = cleanVersion;
+                    document.getElementById(`date-${tool.id}`).innerText = `Updated ${dateInfo.string}`;
+                    
+                    const btnEl = document.getElementById(`btn-${tool.id}`);
+                    btnEl.href = downloadUrl;
+                    btnEl.innerHTML = `
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                        ${btnText}
+                    `;
+
+                    return { id: tool.id, ts: dateInfo.ts };
+                } catch (err) {
+                    document.getElementById(`ver-${tool.id}`).innerText = "Active";
+                    document.getElementById(`date-${tool.id}`).innerText = "Available Now";
+                    return null;
+                }
+            });
+
+            const results = await Promise.all(fetchPromises);
+            const validResults = results.filter(r => r && r.ts > 0);
+            
+            if (validResults.length > 0) {
+                const latestTool = validResults.reduce((prev, current) => (prev.ts > current.ts) ? prev : current);
+                const verContainer = document.getElementById(`ver-container-${latestTool.id}`);
+                const badge = document.createElement('span');
+                badge.className = "flex items-center gap-1.5 px-2 py-1 bg-blue-500/20 text-blue-300 text-[0.6rem] font-bold rounded border border-blue-500/30 whitespace-nowrap";
+                badge.innerHTML = `
+                    <span class="relative flex h-1.5 w-1.5">
+                      <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
+                      <span class="relative inline-flex rounded-full h-1.5 w-1.5 bg-blue-500"></span>
+                    </span>
+                    Recently Updated
+                `;
+                verContainer.prepend(badge);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', loadTools);
+    </script>
+</body>
+</html>
